@@ -31,12 +31,36 @@ source .venv/bin/activate
 pip install -e ".[scrape,geo,match,schedule]"   # everything
 pip install -e ".[dev]"                          # pytest
 
-cp .env.example .env   # fill in API keys
 ```
 
-Adzuna, JSearch, and USAJobs need free API keys (see `.env.example` for
-signup links). Without keys those adapters just no-op — Remotive and RemoteOK
-work with zero configuration.
+Create a `.env` file in the project root (it's git-ignored) with:
+
+```bash
+# Adzuna (https://developer.adzuna.com/) — free app key
+ADZUNA_APP_ID=
+ADZUNA_APP_KEY=
+
+# JSearch (https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) via RapidAPI.
+# Paste just the key value (x-rapidapi-key), not the whole example snippet.
+RAPIDAPI_KEY=
+
+# USAJobs (https://developer.usajobs.gov/) — requires your email as a User-Agent
+USAJOBS_API_KEY=
+USAJOBS_USER_AGENT=
+
+# Optional — Claude API, used only for shortlist match rationale (M4)
+ANTHROPIC_API_KEY=
+
+# Handshake best-effort adapter (M6, off by default, needs "handshake" added
+# to sources.besteffort_enabled in config.yaml too). Log into
+# app.joinhandshake.com, open DevTools > Network, copy the raw `Cookie:`
+# request header value from any XHR request. Re-capture when it expires.
+HANDSHAKE_COOKIE=
+```
+
+Adzuna, JSearch, and USAJobs need free API keys (see signup links above).
+Without keys those adapters just no-op — Remotive and RemoteOK work with zero
+configuration.
 
 ## Run
 
@@ -57,7 +81,7 @@ meaningless against the placeholder.
 ```
 config.yaml           anchors, location tiers, seed queries, enabled sources, match settings
 companies.yaml         ATS (Greenhouse/Lever/Workday) targets
-.env.example            API key template — copy to .env (git-ignored)
+.env                     API keys, git-ignored — see Setup above for the vars to fill in
 resume.md                match-scoring source of truth — fill this in
 src/job_app_finder/
   config.py               loads config.yaml + companies.yaml + .env
