@@ -1,0 +1,26 @@
+# ATS-adapter targets for the "depth" pass (M3 in Job Application Finder.md).
+# Each entry drives a Greenhouse / Lever / Workday adapter run. Tokens/handles
+# below are placeholders — verify each company's actual ATS slug before
+# enabling (check their public careers page URL) and uncomment.
+#
+# Candidate employers near the anchors, per the project brief:
+#   Rochester, MN: Mayo Clinic, IBM Rochester, Benchmark Electronics
+#   Fargo, ND:     Microsoft, John Deere, Doosan Bobcat, RDO Equipment,
+#                  Border States, Bell Bank, Sanford Health
+
+greenhouse:
+  []
+  # - token: example-co          # careers.example.com uses boards.greenhouse.io/example-co
+  #   name: Example Co           # display name (optional, defaults to token)
+
+lever:
+  []
+  # - handle: example-co         # jobs.lever.co/example-co
+  #   name: Example Co
+
+workday:
+  []
+  # - tenant: example
+  #   site: example_careers      # https://example.wd1.myworkdayjobs.com/example_careers
+  #   host: wd1                  # optional, some tenants use wd5 etc. — check the careers URL
+  #   name: Example Co

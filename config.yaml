@@ -1,0 +1,63 @@
+# Job Application Finder — runtime config (non-secret).
+# Secrets (API keys) live in .env — see .env.example.
+# Employer/ATS tokens live in companies.yaml.
+
+anchors:
+  - name: "Fargo, ND"
+    zip: "58102"
+    lat: 46.8772
+    lon: -96.7898
+  - name: "Rochester, MN"
+    zip: "55901"
+    lat: 44.0234
+    lon: -92.4630
+
+# Distance thresholds (miles) used to assign location_tier — see the
+# Location & Ranking Model in Job Application Finder.md.
+location_tiers:
+  tier_0_max_miles: 60   # local on-site
+  tier_1_max_miles: 150  # regional on-site
+
+# Seed search queries, tried against every source that supports keyword search.
+# From Resume.md's Target Roles section.
+seed_queries:
+  - "software engineering intern"
+  - "software engineering co-op"
+  - "AI ML intern"
+  - "AI ML co-op"
+  - "systems developer intern"
+  - "systems developer co-op"
+  - "full-stack development intern"
+  - "full-stack development co-op"
+
+sources:
+  # Backbone adapters, enabled by default (compliant public APIs).
+  # ATS adapters (greenhouse/lever/workday) are no-ops until companies.yaml
+  # has entries, so it's safe to leave them enabled.
+  enabled:
+    - adzuna
+    - jsearch
+    - usajobs
+    - greenhouse
+    - lever
+    - workday
+    - remotive
+    - remoteok
+  # Best-effort / ToS-risky adapters — off by default, opt in explicitly.
+  besteffort_enabled: []
+    # - handshake
+    # - linkedin_direct
+
+refresh:
+  background_interval_minutes: 30
+
+database:
+  path: "data/job_app_finder.db"
+
+match:
+  resume_path: "Resume.md"
+  # Bulk scoring is local embeddings + keyword (free). Claude is only used for
+  # a one-line rationale on the top-N shortlist, and only if ANTHROPIC_API_KEY
+  # is set — swap to claude-haiku-4-5 here for a cheaper shortlist pass.
+  claude_model: "claude-opus-4-8"
+  shortlist_size: 10

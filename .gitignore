@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.example
+data/*.db
+.streamlit/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+Resume.md
+resume.md

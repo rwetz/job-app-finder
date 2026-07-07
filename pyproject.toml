@@ -1,0 +1,27 @@
+[project]
+name = "job-app-finder"
+version = "0.1.0"
+description = "Local job/internship aggregator ranked by proximity to Fargo, ND and Rochester, MN"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "streamlit>=1.35",
+]
+
+# Grouped by the milestone that first needs them (see Job Application Finder.md).
+# `pip install -e .` alone is enough to run the M1 skeleton / hello-world.
+[project.optional-dependencies]
+scrape = ["playwright>=1.44", "beautifulsoup4>=4.12", "selectolax>=0.3"]   # M3 ATS/board adapters
+geo = ["uszipcode>=1.0"]                                                  # M2 geocoding/tiering
+match = ["sentence-transformers>=3.0", "anthropic>=0.40"]                 # M4 matching (anthropic only needed for shortlist rationale)
+schedule = ["apscheduler>=3.10"]                                          # M5 background refresh
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/job_app_finder"]
