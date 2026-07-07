@@ -50,6 +50,12 @@ sources:
 
 refresh:
   background_interval_minutes: 30
+  # Active liveness probe: GET each posting's own URL looking for a 404 or a
+  # "no longer accepting applications"-style page. Supplements the passive
+  # not-seen-in-a-refresh staleness check, which alone misses postings from
+  # search-based aggregators (Adzuna/JSearch/USAJobs) — see link_check.py.
+  link_check_enabled: true
+  link_check_interval_hours: 6
 
 database:
   path: "data/job_app_finder.db"

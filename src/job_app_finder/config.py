@@ -19,6 +19,8 @@ class Config:
     besteffort_enabled: list[str]
     refresh_interval_minutes: int
     db_path: Path
+    link_check_enabled: bool = False
+    link_check_interval_hours: int = 6
     companies: dict = field(default_factory=dict)
     resume_path: Path = PROJECT_ROOT / "resume.md"
     claude_model: str = "claude-opus-4-8"
@@ -44,6 +46,8 @@ def load_config(
         enabled_sources=raw["sources"]["enabled"],
         besteffort_enabled=raw["sources"].get("besteffort_enabled", []),
         refresh_interval_minutes=raw["refresh"]["background_interval_minutes"],
+        link_check_enabled=raw["refresh"].get("link_check_enabled", False),
+        link_check_interval_hours=raw["refresh"].get("link_check_interval_hours", 6),
         db_path=PROJECT_ROOT / raw["database"]["path"],
         companies=companies,
         resume_path=PROJECT_ROOT / raw.get("match", {}).get("resume_path", "resume.md"),

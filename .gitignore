@@ -4,10 +4,11 @@ __pycache__/
 .env
 .env.example
 data/*.db
-.streamlit/
+.streamlit/secrets.toml
 .pytest_cache/
 *.egg-info/
 dist/
 build/
 Resume.md
 resume.md
+.claude/

@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS postings (
     match_score      REAL,
     match_rationale  TEXT,
     is_stale         INTEGER NOT NULL DEFAULT 0,
+    stale_reason     TEXT CHECK (stale_reason IS NULL OR stale_reason IN ('not_seen', 'link_check')),
+    last_checked_at  TEXT,
     UNIQUE (source, external_id)
 );
 

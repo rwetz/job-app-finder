@@ -42,7 +42,8 @@ def upsert_postings(conn: sqlite3.Connection, postings: list[Posting]) -> tuple[
             conn.execute(
                 """
                 UPDATE postings
-                SET merged_sources = ?, posted_at = ?, fetched_at = ?, last_seen_at = ?, is_stale = 0
+                SET merged_sources = ?, posted_at = ?, fetched_at = ?, last_seen_at = ?,
+                    is_stale = 0, stale_reason = NULL
                 WHERE id = ?
                 """,
                 (",".join(sorted(merged)), earliest_posted, p.fetched_at, now, row["id"]),
@@ -55,8 +56,41 @@ def upsert_postings(conn: sqlite3.Connection, postings: list[Posting]) -> tuple[
 
 def mark_stale_not_seen_since(conn: sqlite3.Connection, cutoff_iso: str) -> int:
     cursor = conn.execute(
-        "UPDATE postings SET is_stale = 1 WHERE last_seen_at < ? AND is_stale = 0",
+        "UPDATE postings SET is_stale = 1, stale_reason = 'not_seen' WHERE last_seen_at < ? AND is_stale = 0",
         (cutoff_iso,),
     )
     conn.commit()
     return cursor.rowcount
+
+
+def get_link_check_candidates(
+    conn: sqlite3.Connection, cutoff_iso: str, limit: int = 150
+) -> list[sqlite3.Row]:
+    """Postings not already known-stale and not probed since cutoff_iso, oldest-checked first."""
+    return conn.execute(
+        """
+        SELECT id, url FROM postings
+        WHERE is_stale = 0 AND (last_checked_at IS NULL OR last_checked_at < ?)
+        ORDER BY last_checked_at IS NOT NULL, last_checked_at ASC
+        LIMIT ?
+        """,
+        (cutoff_iso, limit),
+    ).fetchall()
+
+
+def record_link_check_results(
+    conn: sqlite3.Connection, checked_ids: list[int], offline_ids: list[int], now: str
+) -> None:
+    if checked_ids:
+        placeholders = ",".join("?" * len(checked_ids))
+        conn.execute(
+            f"UPDATE postings SET last_checked_at = ? WHERE id IN ({placeholders})",
+            (now, *checked_ids),
+        )
+    if offline_ids:
+        placeholders = ",".join("?" * len(offline_ids))
+        conn.execute(
+            f"UPDATE postings SET is_stale = 1, stale_reason = 'link_check' WHERE id IN ({placeholders})",
+            offline_ids,
+        )
+    conn.commit()

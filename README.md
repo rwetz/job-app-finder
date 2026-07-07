@@ -19,7 +19,10 @@ All six milestones (M1–M6) from the spec are implemented:
   match-score shortlist only.
 - **M5 — Freshness:** APScheduler background refresh (keeps data warm even
   when the app isn't open) + live fetch on open + "fetched N min ago" +
-  stale-posting flags.
+  stale-posting flags. Staleness comes from two signals: a passive
+  not-seen-in-a-refresh check, and an active link check that GETs each
+  posting's own URL looking for a 404 or a closed-job page — the UI badges
+  these differently ("Possibly stale" vs "Confirmed offline").
 - **M6 — Handshake (flagged):** cookie-session best-effort adapter, off by
   default — opt in via `besteffort_enabled` in `config.yaml`.
 
@@ -58,6 +61,15 @@ ANTHROPIC_API_KEY=
 HANDSHAKE_COOKIE=
 ```
 
+`config.yaml`'s `refresh` section controls freshness behavior:
+
+```yaml
+refresh:
+  background_interval_minutes: 30   # background + "is this page stale" threshold
+  link_check_enabled: true          # active liveness probe, see M5 above
+  link_check_interval_hours: 6      # min hours between re-checking the same posting
+```
+
 Adzuna, JSearch, and USAJobs need free API keys (see signup links above).
 Without keys those adapters just no-op — Remotive and RemoteOK work with zero
 configuration.
@@ -83,19 +95,22 @@ config.yaml           anchors, location tiers, seed queries, enabled sources, ma
 companies.yaml         ATS (Greenhouse/Lever/Workday) targets
 .env                     API keys, git-ignored — see Setup above for the vars to fill in
 resume.md                match-scoring source of truth — fill this in
+.streamlit/config.toml    theme (fonts, colors, radii) for the dashboard
 src/job_app_finder/
   config.py               loads config.yaml + companies.yaml + .env
   models.py                Posting / Anchor dataclasses
   dedup.py                  URL canonicalization + fuzzy dedup key
   geo.py                    haversine, geocoding (cached), location tiering
   match.py                  keyword + embedding scoring, Claude shortlist rationale
-  ingest.py                 orchestrates all adapters -> dedup/upsert -> tier -> match
+  ingest.py                 orchestrates all adapters -> dedup/upsert -> tier -> match -> link check
+  link_check.py              active URL liveness probe (404 / closed-job page detection)
   scheduler.py               APScheduler background refresh
   humanize.py                 "N min ago" formatting
   db/                          schema, connection, postings repo, ranked-list queries
   sources/                     one module per adapter + base interface/registry
+  ui.py                         dashboard presentation constants (badges, colors, animation CSS)
   app.py                        Streamlit entrypoint
-tests/                          46 tests — dedup, geo, match, adapters (mocked HTTP), scheduler
+tests/                          65 tests — dedup, geo, match, adapters (mocked HTTP), scheduler, link check
 ```
 
 ## Tests

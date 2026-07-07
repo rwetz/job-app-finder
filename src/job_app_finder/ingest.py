@@ -1,10 +1,15 @@
 import asyncio
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from job_app_finder.config import Config
-from job_app_finder.db.postings_repo import mark_stale_not_seen_since, upsert_postings
+from job_app_finder.db.postings_repo import (
+    get_link_check_candidates,
+    mark_stale_not_seen_since,
+    upsert_postings,
+)
 from job_app_finder.geo import geocode_and_tier_postings
+from job_app_finder.link_check import check_posting_links
 from job_app_finder.match import claude_rationale_shortlist, score_all_postings
 from job_app_finder.models import Posting
 from job_app_finder.sources import get_registry  # noqa: F401 (triggers adapter registration)
@@ -52,6 +57,16 @@ async def ingest_all(config: Config, conn: sqlite3.Connection) -> dict[str, dict
     tiered = await geocode_and_tier_postings(conn, config.anchors, config.location_tiers)
     stale = mark_stale_not_seen_since(conn, run_started_at)
 
+    link_checked = 0
+    link_confirmed_offline = 0
+    if config.link_check_enabled:
+        cutoff = (
+            datetime.now(timezone.utc) - timedelta(hours=config.link_check_interval_hours)
+        ).isoformat()
+        candidates = get_link_check_candidates(conn, cutoff)
+        link_checked = len(candidates)
+        link_confirmed_offline = await check_posting_links(conn, candidates)
+
     scored = 0
     rationales = 0
     if config.resume_path.exists():
@@ -65,6 +80,8 @@ async def ingest_all(config: Config, conn: sqlite3.Connection) -> dict[str, dict
     summary["_meta"] = {
         "tiered": tiered,
         "marked_stale": stale,
+        "link_checked": link_checked,
+        "link_confirmed_offline": link_confirmed_offline,
         "scored": scored,
         "rationales": rationales,
     }
