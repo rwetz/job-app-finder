@@ -10,7 +10,7 @@ dependencies = [
     "streamlit>=1.35",
 ]
 
-# Grouped by the milestone that first needs them (see Job Application Finder.md).
+# Grouped by the milestone that first needs them (see docs/SPEC.md).
 # `pip install -e .` alone is enough to run the M1 skeleton / hello-world.
 [project.optional-dependencies]
 scrape = ["playwright>=1.44", "beautifulsoup4>=4.12", "selectolax>=0.3"]   # M3 ATS/board adapters

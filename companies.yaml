@@ -1,4 +1,4 @@
-# ATS-adapter targets for the "depth" pass (M3 in Job Application Finder.md).
+# ATS-adapter targets for the "depth" pass (M3 in docs/SPEC.md).
 # Each entry drives a Greenhouse / Lever / Workday adapter run. Tokens/handles
 # below are placeholders — verify each company's actual ATS slug before
 # enabling (check their public careers page URL) and uncomment.

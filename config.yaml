@@ -13,7 +13,7 @@ anchors:
     lon: -92.4630
 
 # Distance thresholds (miles) used to assign location_tier — see the
-# Location & Ranking Model in Job Application Finder.md.
+# Location & Ranking Model in docs/SPEC.md.
 location_tiers:
   tier_0_max_miles: 60   # local on-site
   tier_1_max_miles: 150  # regional on-site
