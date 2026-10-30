@@ -1,4 +1,18 @@
-# Job Application Finder
+<p align="center">
+  <img src="assets/logo.svg" width="128" alt="Job Application Finder logo: a map pin above two ranked bars">
+</p>
+
+<h1 align="center">Job Application Finder</h1>
+
+<p align="center">
+  Local-first job and internship aggregator, ranked by distance and resume match.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-343D4B?labelColor=090B10" alt="License"></a>
+</p>
+
+<!-- TODO(readme-standard): add docs/main.png, a screenshot of the running app, and reference it here -->
 
 Local-first job/internship aggregator. Pulls postings from many sources, dedupes
 them, ranks **local & in-person first** (Fargo, ND ↔ Rochester, MN), then
